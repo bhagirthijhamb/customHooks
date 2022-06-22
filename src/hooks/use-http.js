@@ -1,7 +1,11 @@
 import React, { useState, useCallback } from "react";
 
-// const useHttp = (requestConfig, appyData) => {
-// const useHttp = (appyData) => {
+// this hook should be abele to send any kind of request to any kind of url and
+// do any kind of data transformation
+// but it should manage the same state, loading an error and execute the steps in the same order.
+// we'll need parameters to make this hook configurable
+// const useHttp = (requestConfig, applyData) => {
+// const useHttp = (applyData) => { // move requestConfig to sendRequest
 const useHttp = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -10,7 +14,7 @@ const useHttp = () => {
   // const sendRequest = useCallback(
   //   async (requestConfig) => {
   const sendRequest = useCallback(
-    async (requestConfig, appyData) => {
+    async (requestConfig, applyData) => {
       setIsLoading(true);
       setError(null);
       try {
@@ -26,15 +30,15 @@ const useHttp = () => {
 
         const data = await response.json();
 
-        appyData(data);
+        applyData(data);
       } catch (err) {
         setError(err.message || "Something went wrong!");
       }
       setIsLoading(false);
     },
-    // [requestConfig, appyData]
-    // [appyData]
-    [] //no more dependencies for useCallback as all the data its operating on is received as parameters in the wrapped funcitons
+    // [requestConfig, applyData] // both are object, so make sure these are not recreated when App component function runs again.
+    // [appyData] // remove requestConfig as it's moved from useHttp to sendRequest
+    [] //no more dependencies for useCallback as all the data its operating on is received as parameters in the wrapped functions (sendRequest)
   );
   return { isLoading, error, sendRequest };
 };
